@@ -8,8 +8,10 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>{{title|title}}</title>
-    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet"
+        crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js"
+        crossorigin="anonymous"></script>
 </head>
 
 {{include('admin/style.html')}}
@@ -18,14 +20,20 @@
 </script>
 
 <body class="sb-nav-fixed">
-    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navigation -->
+    <nav class="sb-topnav navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand px-1" href="/admin"><i class="fas fa-cogs mx-1"></i>Administração</a>
-            <div>
-                <a class="btn btn-dark border btn-outline-light rounded px-1" href="/"><i class="fas fa-store mx-2"></i></a>
-                <a class="btn btn-dark border btn-outline-light rounded px-1" href="/perfil"><i class="fas fa-user mx-2"></i></a>
-                <a class="btn btn-dark btn-outline-danger border rounded px-1" href="/logout"><i class="fas fa-sign-out-alt mx-2"></i></a>
+            <div class="navbar-header">
+                <a class="navbar-brand px-1" href="/admin"><i class="fas fa-cogs mx-1"></i>Administração</a>
             </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="mx-1"><a class="btn btn-dark border btn-outline-light rounded px-1" href="/"><i
+                            class="fas fa-store mx-2"></i></a></li>
+                <li class="mx-1"><a class="btn btn-dark border btn-outline-light rounded px-1" href="/perfil"><i
+                            class="fas fa-user mx-2"></i></a></li>
+                <li class="mx-1"><a class="btn btn-dark btn-outline-danger border rounded px-1" href="/logout"><i
+                            class="fas fa-sign-out-alt mx-2"></i></a></li>
+            </ul>
         </div>
     </nav>
     <div id="layoutSidenav">
@@ -52,3 +60,11 @@
         </div>
         <div id="layoutSidenav_content">
             <main>
+                {% if alerta != null%}
+                <div class="alert alert-{{alerta.tipo}} m-4 text-center" role="alert">
+                    {{alerta.mensagem}}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}

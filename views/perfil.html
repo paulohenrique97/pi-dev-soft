@@ -1,0 +1,79 @@
+{{include('header.html')}}
+<div class="card m-2">
+    <div class="card-header"><i class="fas fa-user mx-2"></i>Perfil</div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="usuario">Usuário</label>
+                    <div class="input-group my-1">
+                        <input class="form-control" pattern="[^\s]+" name="usuario" id="usuario" required type="text" aria-describedby="ajudaUsuario" placeholder="Usuário" value="{{usuario.usuario}}" />
+                    </div>
+                    <small id="ajudaUsuario" class="form-text text-muted">Usado para login. Sem espaços.</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="nome">Nome</label>
+                    <div class="input-group my-1">
+                        <input class="form-control" name="nome" id="nome" required type="text" placeholder="Nome" value="{{usuario.nome|title}}" />
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="sobrenome">Sobrenome</label>
+                    <div class="input-group my-1">
+                        <input class="form-control" name="sobrenome" id="sobrenome" required type="text" placeholder="Sobrenome" value="{{usuario.sobrenome|title}}" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="cep">CEP</label>
+                    <div class="input-group my-1">
+                        <input class="form-control" name="cep" id="cep" type="number" aria-describedby="ajudaCep" min="09999999" max="99999999" value="{{usuario.cep}}" />
+                    </div>
+                    <small id="ajudaCep" class="form-text text-muted">CEP - Somente os números!</small>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="residencia">Número da Residência</label>
+                    <div class="input-group my-1">
+                        <input class="form-control" name="residencia" id="residencia" type="number" aria-describedby="ajudaResidencia" placeholder="Número da Residência" value="{{usuario.numero_residencia}}" />
+                    </div>
+                    <small id="ajudaResidencia" class="form-text text-muted">Número da Residencia. Usado nas entregas.</small>
+                </div>
+            </div>
+            <div class="input-group my-1">
+                <!-- <input class="btn btn-primary px-5" type="submit" value="Logar"> -->
+                <button type="submit" class="btn btn-success my-1"><i class="fas fa-save mx-4"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card m-2">
+    <div class="card-header"><i class="fas fa-lock mx-2"></i>Trocar Senha</div>
+    <div class="card-body">
+        <form method="POST" action="/perfil/senha">
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="senha">Senha Atual</label>
+                    <div class="input-group my-1">
+                        <input class="form-control" name="senha" id="senha" required type="password" placeholder="Senha Atual" />
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="nova_senha">Nova Senha</label>
+                    <div class="input-group my-1">
+                        <input class="form-control" name="nova_senha" id="nova_senha" required type="password" placeholder="Nova Senha"/>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group my-1">
+                <!-- <input class="btn btn-primary px-5" type="submit" value="Logar"> -->
+                <button type="submit" class="btn btn-success my-1"><i class="fas fa-save mx-4"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+<br>
+
+{{include('footer.html')}}

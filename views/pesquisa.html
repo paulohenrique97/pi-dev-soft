@@ -1,0 +1,40 @@
+{{ include('header.html') }}
+<div class="row justify-content-center">
+    <div class="col-lg-2">
+        <h1 class="my-4">Categorias</h1>
+        <div class="list-group">
+            {% for categoria in categorias %}
+            <a href="/categoria/{{categoria.id}}" class="list-group-item">
+                {{categoria.nome|title}}
+            </a> {% else %}
+            <div class="col-lg-3">
+                <p>Não foram encontradas categorias</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <h1 class="my-4">Resultados da Pesquisa por {{pesquisa|title}}</h1>
+        <div class="row">
+            {% for produto in produtos %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 text-center">
+                    <a href="/produto/{{produto.id}}"><img class="img-fluid" style="max-height: 150px;" src="{{produto.link_foto}}" alt=""></a>
+                    <div class="card-body">
+                        <h6 class="card-title text-left">
+                            <a href="/produto/{{produto.id}}">{{produto.nome|title}}</a>
+                        </h6>
+                    </div>
+                    <div class="card-footer text-left">
+                        <h6>R${{produto.preco|number_format(2, ',', '.')}}</h6>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <p>Não foram encontrados produtos</p>
+            </div> {% endfor %}
+        </div>
+    </div>
+</div>
+{{ include('footer.html') }}

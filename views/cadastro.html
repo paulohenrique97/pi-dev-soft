@@ -7,49 +7,56 @@
             </div>
             <div class="card-body">
                 <form method="POST">
-                    <div class="input-group my-1">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="usuario"><i class="fas fa-user"></i></label>
-                        </div>
-                        <input class="form-control" name="usuario" id="usuario" type="text" placeholder="Usuário" />
-                    </div>
-                    <div class="input-group my-1">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="senha"><i class="fas fa-lock"></i></label>
-                        </div>
-                        <input class="form-control" name="senha" id="senha" type="password" placeholder="Senha" />
-                    </div>
-                    <div class="input-group my-1">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="nome"><i class="fas fa-male mx-1"></i></label>
-                        </div>
-                        <input class="form-control" name="nome" id="nome" type="text" placeholder="Nome" />
-                    </div>
-                    <div class="input-group my-1">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="sobrenome"><i class="fas fa-male mx-1"></i></label>
-                        </div>
-                        <input class="form-control" name="sobrenome" id="sobrenome" type="text" placeholder="Sobrenome" />
-                    </div>
-                    <div class="form-group">
-                        <div class="input-group my-1">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="cep"><i class="fas fa-map-marker-alt"></i></label>
+                    <small class="form-text text-muted my-1">* Campos obrigatórios</small>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="usuario">Usuário *</label>
+                            <div class="input-group my-1">
+                                <input class="form-control" pattern="[^\s]+" name="usuario" id="usuario" required type="text" aria-describedby="ajudaUsuario" placeholder="Usuário" />
                             </div>
-                            <input class="form-control" name="cep" id="cep" type="number" aria-describedby="ajudaCep" min="09999999" max="99999999" />
+                            <small id="ajudaUsuario" class="form-text text-muted">Usado para login. Sem espaços.</small>
                         </div>
-                        <small id="ajudaCep" class="form-text text-muted">Somente os números!</small>
+                        <div class="form-group col-md-6">
+                            <label for="senha">Senha *</label>
+                            <div class="input-group my-1">
+                                <input class="form-control" name="senha" id="senha" required type="password" aria-describedby="ajudaSenha" placeholder="Senha" />
+                            </div>
+                            <small id="ajudaSenha" class="form-text text-muted">Senha. Usada para login.</small>
+                        </div>
                     </div>
-
-                    <div class="input-group my-1">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="residencia"><i class="fas fa-hashtag"></i></label>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="nome">Nome *</label>
+                            <div class="input-group my-1">
+                                <input class="form-control" name="nome" id="nome" required type="text" placeholder="Nome" />
+                            </div>
                         </div>
-                        <input class="form-control" name="residencia" id="residencia" type="number" placeholder="Número da Residência" />
+                        <div class="form-group col-md-6">
+                            <label for="sobrenome">Sobrenome *</label>
+                            <div class="input-group my-1">
+                                <input class="form-control" name="sobrenome" id="sobrenome" required type="text" placeholder="Sobrenome" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="cep">CEP</label>
+                            <div class="input-group my-1">
+                                <input class="form-control" name="cep" id="cep" type="number" aria-describedby="ajudaCep" min="09999999" max="99999999" placeholder="CEP" />
+                            </div>
+                            <small id="ajudaCep" class="form-text text-muted">CEP - Somente os números!</small>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="residencia">Número da Residência</label>
+                            <div class="input-group my-1">
+                                <input class="form-control" name="residencia" id="residencia" type="number" aria-describedby="ajudaResidencia" placeholder="Nº da Residência" />
+                            </div>
+                            <small id="ajudaResidencia" class="form-text text-muted">Número da Residencia. Usado nas entregas.</small>
+                        </div>
                     </div>
                     <div class="input-group my-1">
                         <!-- <input class="btn btn-primary px-5" type="submit" value="Logar"> -->
-                        <button type="submit" class="btn btn-primary my-1"><i class="fas fa-user-edit mx-4"></i></button>
+                        <button type="submit" class="btn btn-success my-1"><i class="fas fa-save mx-4"></i></button>
                     </div>
                 </form>
             </div>

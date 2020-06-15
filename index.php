@@ -8,6 +8,7 @@ use Slim\Views\Twig;
 require_once "vendor/autoload.php";
 require_once "src/db.php";
 require_once "src/autentica.php";
+require_once "src/alerta.php";
 
 session_start();
 
@@ -27,15 +28,22 @@ $app->get("/", function (Request $request, Response $response, $args) {
     global $view;
     return $view->render($response, "index.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Índice",
         "categorias" => $categorias,
         "produtos" => $produtos
     ]);
 });
 
+$app->post("/carrinho", function (Request $request, Response $response, $args) {
+    novo_alerta("info", "A função de compra ainda não está completa. Nos desculpe pelo transtorno.");
+    header("Location: /");
+});
+
 $app->get("/produto/{id}", function (Request $request, Response $response, $args) {
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
         header("Location: /");
         return;
     }
@@ -46,6 +54,7 @@ $app->get("/produto/{id}", function (Request $request, Response $response, $args
     $produto = select($sql)[0];
 
     if (!$produto) {
+        novo_alerta("danger", "Produto inexistente.");
         header("Location: /");
         return;
     }
@@ -53,14 +62,40 @@ $app->get("/produto/{id}", function (Request $request, Response $response, $args
     global $view;
     return $view->render($response, "produto.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => $produto["nome"],
         "produto" => $produto
+    ]);
+});
+
+$app->get("/pesquisa", function (Request $request, Response $response, $args) {
+
+    $dados = $request->getQueryParams();
+    $pesquisa = string_segura($dados["pesquisa"]);
+
+    $tabela_categorias = TABELA_CATEGORIA;
+    $sql = "SELECT nome, id FROM $tabela_categorias;";
+    $categorias = select($sql);
+
+    $tabela_produtos = TABELA_PRODUTO;
+    $sql = "SELECT * FROM $tabela_produtos where nome like '%$pesquisa%' or descricao  like '%$pesquisa%';";
+    $produtos = select($sql);
+
+    global $view;
+    return $view->render($response, "pesquisa.html", [
+        "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
+        "title" => "Pesquisar Produto",
+        "categorias" => $categorias,
+        "produtos" => $produtos,
+        "pesquisa" => $pesquisa
     ]);
 });
 
 $app->get("/categoria/{id}", function (Request $request, Response $response, $args) {
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
         header("Location: /");
         return;
     }
@@ -71,6 +106,7 @@ $app->get("/categoria/{id}", function (Request $request, Response $response, $ar
     $categoria = select($sql)[0];
 
     if (!$categoria) {
+        novo_alerta("danger", "Categoria inexistente.");
         header("Location: /");
         return;
     }
@@ -85,6 +121,7 @@ $app->get("/categoria/{id}", function (Request $request, Response $response, $ar
     global $view;
     return $view->render($response, "categoria.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => $categoria["nome"],
         "categoria" => $categoria,
         "categorias" => $categorias,
@@ -94,6 +131,7 @@ $app->get("/categoria/{id}", function (Request $request, Response $response, $ar
 
 $app->get("/cadastro", function (Request $request, Response $response, $args) {
     if (logado()) {
+        novo_alerta("success", "Você já está cadastrado.");
         header("Location: /");
         return;
     }
@@ -101,6 +139,7 @@ $app->get("/cadastro", function (Request $request, Response $response, $args) {
     global $view;
     return $view->render($response, "cadastro.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Cadastro"
     ]);
 });
@@ -108,6 +147,7 @@ $app->get("/cadastro", function (Request $request, Response $response, $args) {
 $app->post("/cadastro", function (Request $request, Response $response, $args) {
 
     if (logado()) {
+        novo_alerta("success", "Você já está cadastrado.");
         header("Location: /");
         return;
     }
@@ -126,6 +166,7 @@ $app->post("/cadastro", function (Request $request, Response $response, $args) {
         $usuario    == "" || $usuario   == " " || $usuario   == null ||
         $senha      == "" || $senha     == " " || $senha     == null
     ) {
+        novo_alerta("danger", "Verifique se todos os campos obrigatórios foram preenchidos.");
         header("Location: /cadastro");
         return;
     }
@@ -135,31 +176,96 @@ $app->post("/cadastro", function (Request $request, Response $response, $args) {
         . "\n(usuario, senha, nome, sobrenome, cep, numero_residencia)"
         . "\nVALUES('$usuario', '$senha', '$nome', '$sobrenome', $cep, $numero_residencia);";
     if (query($sql)) {
+        novo_alerta("success", "Registrado com sucesso.");
         header("Location: /login");
         return;
     } else {
+        novo_alerta("danger", "Algo deu errado, tente novamente mais tarde.");
         header("Location: /cadastro");
         return;
     }
 });
 
 $app->get("/perfil", function (Request $request, Response $response, $args) {
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
-    header("Location: /");
-    return;
 
     global $view;
-    return $view->render($response, "login.html", [
+    return $view->render($response, "perfil.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
-        "title" => "Login"
+        "alerta" => pegar_alerta(),
+        "title" => "Perfil"
     ]);
+});
+
+$app->post("/perfil", function (Request $request, Response $response, $args) {
+
+    atualiza_usuario();
+    if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
+        header("Location: /login");
+        return;
+    }
+
+    $id = $_SESSION["usuario"]["id"];
+    $dados = $request->getParsedBody();
+    $nome = strtoupper(string_segura($dados["nome"]));
+    $sobrenome = strtoupper(string_segura($dados["sobrenome"]));
+    $usuario = string_segura($dados["usuario"]);
+    $cep = (int) $dados["cep"];
+    $numero_residencia = (int) $dados["residencia"];
+
+    $tabela_usuarios = TABELA_USUARIOS;
+    $sql = "UPDATE $tabela_usuarios SET"
+        . "\nusuario = '$usuario', nome = '$nome', sobrenome = '$sobrenome', cep = $cep, numero_residencia = $numero_residencia"
+        . "\nWHERE id = $id;";
+
+    if (query($sql)) novo_alerta("success", "Dados atualizados com sucesso.");
+    novo_alerta("danger", "Algo deu errado, tente novamente mais tarde.");
+
+    header("Location: /perfil");
+    return;
+});
+
+$app->post("/perfil/senha", function (Request $request, Response $response, $args) {
+
+    atualiza_usuario();
+    if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
+        header("Location: /login");
+        return;
+    }
+
+    $id = $_SESSION["usuario"]["id"];
+    $dados = $request->getParsedBody();
+    $senha = $dados["senha"];
+
+    if (!password_verify($senha, $_SESSION["usuario"]["senha"])) {
+        novo_alerta("danger", "Senha Incorreta");
+        header("Location: /perfil");
+        return;
+    }
+
+    $nova_senha = password_hash($dados["nova_senha"], PASSWORD_DEFAULT);
+    $tabela_usuarios = TABELA_USUARIOS;
+    $sql = "UPDATE $tabela_usuarios SET"
+        . "\nsenha = '$nova_senha'"
+        . "\nWHERE id = $id;";
+
+    if (query($sql)) novo_alerta("success", "Senha alterada com sucesso.");
+    else novo_alerta("danger", "Algo deu errado, tente novamente mais tarde.");
+
+    header("Location: /perfil");
+    return;
 });
 
 $app->get("/login", function (Request $request, Response $response, $args) {
     if (logado()) {
+        novo_alerta("success", "Você já está logado.");
         header("Location: /");
         return;
     }
@@ -167,12 +273,14 @@ $app->get("/login", function (Request $request, Response $response, $args) {
     global $view;
     return $view->render($response, "login.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Login"
     ]);
 });
 
 $app->post("/login", function (Request $request, Response $response, $args) {
     if (logado()) {
+        novo_alerta("success", "Você já está logado.");
         header("Location: /");
         return;
     }
@@ -186,6 +294,7 @@ $app->post("/login", function (Request $request, Response $response, $args) {
     $usuario = select($sql)[0];
 
     if ($usuario == false || sizeof($usuario) == 0 || !password_verify($senha, $usuario["senha"])) {
+        novo_alerta("danger", "Usuário ou senha incorretos.");
         header("Location: /login");
         return;
     }
@@ -196,17 +305,15 @@ $app->post("/login", function (Request $request, Response $response, $args) {
 });
 
 $app->get("/logout", function (Request $request, Response $response, $args) {
-    session_destroy();
-    $_SESSION["usuario"] = [
-        "admin" => false
-    ];
-    $_SESSION["logado"] = false;
+    logout();
     header("Location: /");
 });
 
 $app->get("/admin", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -218,13 +325,16 @@ $app->get("/admin", function (Request $request, Response $response, $args) {
     global $view;
     return $view->render($response, "admin/index.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Administração"
     ]);
 });
 
 $app->get("/admin/categorias", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -240,6 +350,7 @@ $app->get("/admin/categorias", function (Request $request, Response $response, $
     global $view;
     return $view->render($response, "admin/categorias.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Administração - Categorias",
         "categorias" => $categorias
     ]);
@@ -247,7 +358,9 @@ $app->get("/admin/categorias", function (Request $request, Response $response, $
 
 $app->get("/admin/categorias/cadastrar", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -259,13 +372,16 @@ $app->get("/admin/categorias/cadastrar", function (Request $request, Response $r
     global $view;
     return $view->render($response, "admin/categorias/cadastro.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Cadastro - Categorias"
     ]);
 });
 
 $app->post("/admin/categorias/cadastrar", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -284,7 +400,8 @@ $app->post("/admin/categorias/cadastrar", function (Request $request, Response $
 
     $tabela_categorias = TABELA_CATEGORIA;
     $sql = "INSERT INTO $tabela_categorias (nome) VALUES ('$nome');";
-    query($sql);
+    if(query($sql)) novo_alerta("success", "Categoria cadastrada com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
 
     header("Location: /admin/categorias");
     return;
@@ -292,7 +409,9 @@ $app->post("/admin/categorias/cadastrar", function (Request $request, Response $
 
 $app->delete("/admin/categorias/deletar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -302,19 +421,24 @@ $app->delete("/admin/categorias/deletar/{id}", function (Request $request, Respo
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
     $id = $args["id"];
     $tabela_categorias = TABELA_CATEGORIA;
     $sql = "DELETE FROM $tabela_categorias WHERE id = $id;";
-    query($sql);
+    if (query($sql)) novo_alerta("success", "Categoria deletada com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
     return;
 });
 
 $app->get("/admin/categorias/editar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -324,6 +448,8 @@ $app->get("/admin/categorias/editar/{id}", function (Request $request, Response 
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
@@ -335,6 +461,7 @@ $app->get("/admin/categorias/editar/{id}", function (Request $request, Response 
     global $view;
     return $view->render($response, "admin/categorias/editar.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Cadastro - Categorias",
         "categoria" => $categoria
     ]);
@@ -342,7 +469,9 @@ $app->get("/admin/categorias/editar/{id}", function (Request $request, Response 
 
 $app->post("/admin/categorias/editar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -352,6 +481,8 @@ $app->post("/admin/categorias/editar/{id}", function (Request $request, Response
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
@@ -361,14 +492,17 @@ $app->post("/admin/categorias/editar/{id}", function (Request $request, Response
 
     $tabela_categorias = TABELA_CATEGORIA;
     $sql = "UPDATE $tabela_categorias SET nome = '$nome' WHERE id = $id;";
-    query($sql);
+    if (query($sql)) novo_alerta("success", "Categoria atualizada com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
 
     header("Location: /admin/categorias");
 });
 
 $app->get("/admin/produtos", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -384,6 +518,7 @@ $app->get("/admin/produtos", function (Request $request, Response $response, $ar
     global $view;
     return $view->render($response, "admin/produtos.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Administração - Produtos",
         "produtos" => $produtos
     ]);
@@ -391,7 +526,9 @@ $app->get("/admin/produtos", function (Request $request, Response $response, $ar
 
 $app->get("/admin/produtos/cadastrar", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -411,6 +548,7 @@ $app->get("/admin/produtos/cadastrar", function (Request $request, Response $res
     global $view;
     return $view->render($response, "admin/produtos/cadastro.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Cadastro - Produtos",
         "formatos" => $formatos,
         "categorias" => $categorias
@@ -419,7 +557,9 @@ $app->get("/admin/produtos/cadastrar", function (Request $request, Response $res
 
 $app->post("/admin/produtos/cadastrar", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -443,6 +583,7 @@ $app->post("/admin/produtos/cadastrar", function (Request $request, Response $re
     $estoque = string_segura($dados["estoque"]);
 
     if ($nome == "" || $nome == " " || $nome == null) {
+        novo_alerta("danger", "Verifique se todos os campos obrigatórios foram preenchidos.");
         header("Location: /admin/produtos/cadastrar");
         return;
     }
@@ -451,7 +592,8 @@ $app->post("/admin/produtos/cadastrar", function (Request $request, Response $re
     $sql = "INSERT INTO $tabela_produtos\n"
         . "(id_categoria, id_formato, nome, descricao, link_foto, preco, peso, altura, largura, comprimento, diametro, estoque)\n"
         . "VALUES($id_categoria, $id_formato, '$nome', '$descricao', '$link_foto', $preco, $peso, $altura, $largura, $comprimento, $diametro, $estoque);";
-    query($sql);
+    if (query($sql)) novo_alerta("success", "Produto cadastrado com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
 
     header("Location: /admin/produtos");
     return;
@@ -459,7 +601,9 @@ $app->post("/admin/produtos/cadastrar", function (Request $request, Response $re
 
 $app->delete("/admin/produtos/deletar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -469,19 +613,24 @@ $app->delete("/admin/produtos/deletar/{id}", function (Request $request, Respons
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
     $id = $args["id"];
     $tabela_produtos = TABELA_PRODUTO;
     $sql = "DELETE FROM $tabela_produtos WHERE id = $id;";
-    query($sql);
+    if (query($sql)) novo_alerta("success", "Produto deletado com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
     return;
 });
 
 $app->get("/admin/produtos/editar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -491,6 +640,8 @@ $app->get("/admin/produtos/editar/{id}", function (Request $request, Response $r
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
@@ -510,6 +661,7 @@ $app->get("/admin/produtos/editar/{id}", function (Request $request, Response $r
     global $view;
     return $view->render($response, "admin/produtos/editar.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Cadastro - Produtos",
         "produto" => $produto,
         "categorias" => $categorias,
@@ -519,7 +671,9 @@ $app->get("/admin/produtos/editar/{id}", function (Request $request, Response $r
 
 $app->post("/admin/produtos/editar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -528,6 +682,8 @@ $app->post("/admin/produtos/editar/{id}", function (Request $request, Response $
         return;
     }
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
@@ -558,7 +714,8 @@ $app->post("/admin/produtos/editar/{id}", function (Request $request, Response $
         . "altura=$altura, largura=$largura, comprimento=$comprimento, diametro=$diametro, estoque=$estoque\n"
         . "WHERE id=$id;";
 
-    query($sql);
+    if (query($sql)) novo_alerta("success", "Produto atualizado com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
 
     header("Location: /admin/produtos");
     return;
@@ -566,7 +723,9 @@ $app->post("/admin/produtos/editar/{id}", function (Request $request, Response $
 
 $app->get("/admin/usuarios", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -582,6 +741,7 @@ $app->get("/admin/usuarios", function (Request $request, Response $response, $ar
     global $view;
     return $view->render($response, "admin/usuarios.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Administração - Usuarios",
         "usuarios" => $usuarios
     ]);
@@ -589,7 +749,9 @@ $app->get("/admin/usuarios", function (Request $request, Response $response, $ar
 
 $app->delete("/admin/usuarios/deletar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -599,19 +761,24 @@ $app->delete("/admin/usuarios/deletar/{id}", function (Request $request, Respons
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
     $id = $args["id"];
     $tabela_usuarios = TABELA_USUARIOS;
     $sql = "DELETE FROM $tabela_usuarios WHERE id = $id;";
-    query($sql);
+    if (query($sql)) novo_alerta("success", "Usuário deletado com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
     return;
 });
 
 $app->get("/admin/usuarios/editar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -621,6 +788,8 @@ $app->get("/admin/usuarios/editar/{id}", function (Request $request, Response $r
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
@@ -632,6 +801,7 @@ $app->get("/admin/usuarios/editar/{id}", function (Request $request, Response $r
     global $view;
     return $view->render($response, "admin/usuarios/editar.html", [
         "usuario" => $_SESSION["usuario"] ?? [],
+        "alerta" => pegar_alerta(),
         "title" => "Editar - Usuario",
         "usuario_selecionado" => $usuario_selecionado
     ]);
@@ -639,7 +809,9 @@ $app->get("/admin/usuarios/editar/{id}", function (Request $request, Response $r
 
 $app->post("/admin/usuarios/editar/{id}", function (Request $request, Response $response, $args) {
 
+    atualiza_usuario();
     if (!logado()) {
+        novo_alerta("info", "Logue-se primeiro.");
         header("Location: /login");
         return;
     }
@@ -649,6 +821,8 @@ $app->post("/admin/usuarios/editar/{id}", function (Request $request, Response $
     }
 
     if (!is_numeric($args["id"])) {
+        novo_alerta("danger", "Id tem que ser número.");
+        header("Location: /");
         return;
     }
 
@@ -659,13 +833,14 @@ $app->post("/admin/usuarios/editar/{id}", function (Request $request, Response $
     $usuario = string_segura($dados["usuario"]);
     $cep = (int) $dados["cep"];
     $numero_residencia = (int) $dados["residencia"];
-    $admin = $dados["admin"] == "true" ? true : false;
-    
+    $admin = (int) $dados["admin"];
+
     $tabela_usuarios = TABELA_USUARIOS;
     $sql = "UPDATE $tabela_usuarios SET"
         . "\nusuario = '$usuario', nome = '$nome', sobrenome = '$sobrenome', cep = $cep, numero_residencia = $numero_residencia, admin = $admin"
         . "\nWHERE id = $id;";
-    query($sql);
+    if (query($sql)) novo_alerta("success", "Usuário atualizado com sucesso.");
+    else novo_alerta("danger", "Algo deu errado. Tente novamente mais tarde.");
 
     header("Location: /admin/usuarios/editar/$id");
     return;

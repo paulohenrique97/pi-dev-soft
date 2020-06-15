@@ -12,14 +12,16 @@
             <div class="col-md-8 text-center">
                 <img class="img-fluid" style="max-height: 400px;" src="{{produto.link_foto}}" alt="foto do produto">
             </div>
-            <div class="col-md-4 border rounded px-2">
+            <div class="col-md-4 border rounded p-2">
+                <h3 class="my-3">Descrição</h3>
+                <hr>
                 <p>{{produto.descricao}}</p>
                 <hr>
                 <h3 class="my-3">R$ {{produto.preco|number_format(2, ',', '.')}}
                 </h3>
                 <hr>
                 <h3 class="my-3">Comprar</h3>
-                <form>
+                <form method="POST" action="/carrinho">
                     <div class="row form-group">
                         <div class="input-group col-sm-7 my-1">
                             <div class="input-group-prepend">
@@ -28,23 +30,9 @@
                             <input class="form-control" name="qtd" id="qtd" type="number" value="1" min="1" />
                         </div>
                         <input type="text" hidden name="produto" value="{{produto.id}}">
-                        <!-- <input type="submit" value="Comprar" class="btn btn-success col-sm-4 my-1 mx-1"> -->
                         <button type="submit" class="btn btn-success"><i class="fas fa-shopping-cart mx-4"></i></button>
                     </div>
                 </form>
-                <!-- <hr>
-                <h5 class="my-3">Calcular Frete</h5>
-                <form>
-                    <div class="row form-group">
-                        <div class="input-group input-group-sm col-sm-8 my-1">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="cep">CEP</label>
-                            </div>
-                            <input class="form-control" name="cep" id="cep" type="number" value="1" min="1" />
-                        </div>
-                        <button onclick="calcularFrete()" class="btn btn-success btn-sm"><i class="fas fa-search mx-3"></i></button>
-                    </div>
-                </form> -->
             </div>
         </div>
         <div class="card card-outline-secondary my-4">

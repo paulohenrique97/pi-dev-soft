@@ -4,23 +4,23 @@
         <a href="/admin/usuarios" class="btn btn-primary"><i class="fas fa-chevron-left mx-4"></i></a>
     </div>
 </div>
-<div class="card-header"><i class="fas fa-edit mx-2"></i>Editar Categoria</div>
+<div class="card-header"><i class="fas fa-edit mx-2"></i>Editar Usuário</div>
 <div class="card-body">
     <form method="POST">
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="usuario">Usuário</label>
                 <div class="input-group my-1">
-                    <input class="form-control" name="usuario" id="usuario" type="text" aria-describedby="ajudaUsuario" placeholder="Usuário" value="{{usuario_selecionado.usuario}}" />
+                    <input class="form-control" pattern="[^\s]+" name="usuario" id="usuario" required type="text" aria-describedby="ajudaUsuario" placeholder="Usuário" value="{{usuario_selecionado.usuario}}" />
                 </div>
-                <small id="ajudaUsuario" class="form-text text-muted">Apelido do Usuário. Usado para login.</small>
+                <small id="ajudaUsuario" class="form-text text-muted">Usado para login. Sem espaços.</small>
             </div>
             <div class="form-group col-md-6">
                 <label for="admin">Administrador</label>
                 <div class="input-group">
                     <select class="form-control" name="admin" id="admin">
-                        <option value="true">Sim</option>
-                        <option value="false">Não</option>
+                        <option value=1 {% if usuario_selecionado.admin == 1 %} selected {% endif %}>Sim</option>
+                        <option value=0 {% if usuario_selecionado.admin == 0 %} selected {% endif %}>Não</option>
                     </select>
                 </div>
             </div>
@@ -29,13 +29,13 @@
             <div class="form-group col-md-6">
                 <label for="nome">Nome</label>
                 <div class="input-group my-1">
-                    <input class="form-control" name="nome" id="nome" type="text" placeholder="Nome" value="{{usuario_selecionado.nome|title}}" />
+                    <input class="form-control" name="nome" id="nome" required type="text" placeholder="Nome" value="{{usuario_selecionado.nome|title}}" />
                 </div>
             </div>
             <div class="form-group col-md-6">
                 <label for="sobrenome">Sobrenome</label>
                 <div class="input-group my-1">
-                    <input class="form-control" name="sobrenome" id="sobrenome" type="text" placeholder="Sobrenome" value="{{usuario_selecionado.sobrenome|title}}" />
+                    <input class="form-control" name="sobrenome" id="sobrenome" required type="text" placeholder="Sobrenome" value="{{usuario_selecionado.sobrenome|title}}" />
                 </div>
             </div>
         </div>
