@@ -1,0 +1,16 @@
+{
+    "name": "paulopatine/pi-dev-soft",
+    "description": "Pi de Desenvolvimento de Software I - 2020/1",
+    "type": "project",
+    "scripts": {
+        "start": "php -S localhost:80"
+    },
+    "require": {
+        "slim/slim": "^4.5",
+        "twig/twig": "^3.0",
+        "slim/psr7": "^1.1",
+        "slim/twig-view": "^3.1",
+        "ext-mysqli": "*",
+        "ext-json": "*"
+    }
+}

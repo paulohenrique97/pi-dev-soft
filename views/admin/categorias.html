@@ -1,0 +1,69 @@
+{{include('admin/header.html')}}
+<div class="row my-2 mx-2 justify-content-md-start">
+    <div class="col-md-3">
+        <a href="/admin/categorias/cadastrar" class="btn btn-success"><i class="fas fa-pen mx-4"></i></a>
+    </div>
+</div>
+<div class="card-header"><i class="fas fa-table mx-2"></i>Categorias</div>
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </tfoot>
+            <tbody>
+                {% for categoria in categorias%}
+                <tr>
+                    <td>{{categoria.id}}</td>
+                    <td>{{categoria.nome|title}}</td>
+                    <td>
+                        <a href="/admin/categorias/editar/{{categoria.id}}" class="btn btn-primary my-1"><i class="fas fa-edit mx-4"></i></a>
+                        <button class="btn btn-danger my-1" onclick="deletar({{ categoria.id }}, '{{ categoria.nome }}')"><i class="fas fa-trash-alt mx-4"></i></button>
+                    </td>
+                </tr>
+                {% else %} Não foram encontradas categorias {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    opts = {
+        "columnDefs": [{
+            "width": "5%",
+            "targets": 0
+        }, {
+            "width": "auto",
+            "targets": 1
+        }, {
+            "width": "17%",
+            "targets": 2
+        }]
+    };
+
+    function deletar(id, nome) {
+        let texto = `Tem certeza que deseja deletar a categoria ${nome}?` +
+            "\nIsto deletará todos os produtos desta categoria.";
+        if (confirm(texto)) {
+            let url = `/admin/categorias/deletar/${id}`;
+            fetch(url, {
+                method: "delete"
+            }).then((resposta) => {
+                location.reload();
+            }).catch((e) => {
+                alert(e);
+            });
+        }
+    }
+</script>
+{{include('admin/footer.html')}}

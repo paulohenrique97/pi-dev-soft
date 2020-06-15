@@ -1,0 +1,18 @@
+{{include('admin/header.html')}}
+<div class="row my-2 mx-2 justify-content-md-start">
+    <div class="col-md-3">
+        <a href="/admin/categorias" class="btn btn-primary"><i class="fas fa-chevron-left mx-4"></i></a>
+    </div>
+</div>
+<div class="card-header"><i class="fas fa-pen mx-2"></i>Cadastrar Categoria</div>
+<div class="card-body">
+    <form method="POST">
+        <div class="form-group">
+            <label for="nome">Nome</label>
+            <input type="text" class="form-control" id="nome" name="nome" aria-describedby="ajudaNome" placeholder="Nome">
+            <small id="ajudaNome" class="form-text text-muted">Nome da categoria.</small>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fas fa-pen mx-4"></i></button>
+    </form>
+</div>
+{{include('admin/footer.html')}}

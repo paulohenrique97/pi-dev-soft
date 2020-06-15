@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>{{title|title}}</title>
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" crossorigin="anonymous"></script>
+</head>
+
+{{include('admin/style.html')}}
+<script>
+    var opts = undefined;
+</script>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand px-1" href="/admin"><i class="fas fa-cogs mx-1"></i>Administração</a>
+            <div>
+                <a class="btn btn-dark border btn-outline-light rounded px-1" href="/"><i class="fas fa-store mx-2"></i></a>
+                <a class="btn btn-dark border btn-outline-light rounded px-1" href="/perfil"><i class="fas fa-user mx-2"></i></a>
+                <a class="btn btn-dark btn-outline-danger border rounded px-1" href="/logout"><i class="fas fa-sign-out-alt mx-2"></i></a>
+            </div>
+        </div>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading">Administrar</div>
+                        <a class="nav-link" href="/admin/categorias">
+                            <div class="sb-nav-link-icon"><i class="fas fa-list-ul"></i></div>
+                            Categorias
+                        </a>
+                        <a class="nav-link" href="/admin/produtos">
+                            <div class="sb-nav-link-icon"><i class="fas fa-shopping-bag"></i></div>
+                            Produtos
+                        </a>
+                        <a class="nav-link" href="/admin/usuarios">
+                            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                            Usuários
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>

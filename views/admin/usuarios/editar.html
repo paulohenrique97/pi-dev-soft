@@ -1,0 +1,64 @@
+{{include('admin/header.html')}}
+<div class="row my-2 mx-2 justify-content-md-start">
+    <div class="col-md-3">
+        <a href="/admin/usuarios" class="btn btn-primary"><i class="fas fa-chevron-left mx-4"></i></a>
+    </div>
+</div>
+<div class="card-header"><i class="fas fa-edit mx-2"></i>Editar Categoria</div>
+<div class="card-body">
+    <form method="POST">
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="usuario">Usuário</label>
+                <div class="input-group my-1">
+                    <input class="form-control" name="usuario" id="usuario" type="text" aria-describedby="ajudaUsuario" placeholder="Usuário" value="{{usuario_selecionado.usuario}}" />
+                </div>
+                <small id="ajudaUsuario" class="form-text text-muted">Apelido do Usuário. Usado para login.</small>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="admin">Administrador</label>
+                <div class="input-group">
+                    <select class="form-control" name="admin" id="admin">
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="nome">Nome</label>
+                <div class="input-group my-1">
+                    <input class="form-control" name="nome" id="nome" type="text" placeholder="Nome" value="{{usuario_selecionado.nome|title}}" />
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="sobrenome">Sobrenome</label>
+                <div class="input-group my-1">
+                    <input class="form-control" name="sobrenome" id="sobrenome" type="text" placeholder="Sobrenome" value="{{usuario_selecionado.sobrenome|title}}" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="cep">CEP</label>
+                <div class="input-group my-1">
+                    <input class="form-control" name="cep" id="cep" type="number" aria-describedby="ajudaCep" min="09999999" max="99999999" value="{{usuario_selecionado.cep}}" />
+                </div>
+                <small id="ajudaCep" class="form-text text-muted">CEP - Somente os números!</small>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="residencia">Número da Residência</label>
+                <div class="input-group my-1">
+                    <input class="form-control" name="residencia" id="residencia" type="number" aria-describedby="ajudaResidencia" placeholder="Número da Residência" value="{{usuario_selecionado.numero_residencia}}" />
+                </div>
+                <small id="ajudaResidencia" class="form-text text-muted">Número da Residencia. Usado nas entregas.</small>
+            </div>
+        </div>
+        <div class="input-group my-1">
+            <!-- <input class="btn btn-primary px-5" type="submit" value="Logar"> -->
+            <button type="submit" class="btn btn-success my-1"><i class="fas fa-save mx-4"></i></button>
+        </div>
+    </form>
+</div>
+{{include('admin/footer.html')}}
