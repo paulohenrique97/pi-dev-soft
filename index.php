@@ -20,7 +20,6 @@ $app->get("/", function (Request $request, Response $response, $args) {
     $tabela_produtos = TABELA_PRODUTO;
     $sql = "SELECT * FROM $tabela_produtos ORDER BY data_criacao DESC LIMIT 9;";
     $produtos = select($sql);
-
     $tabela_categorias = TABELA_CATEGORIA;
     $sql = "SELECT nome, id FROM $tabela_categorias;";
     $categorias = select($sql);
