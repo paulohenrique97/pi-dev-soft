@@ -17,9 +17,7 @@ function administrador()
 function logout()
 {
     session_destroy();
-    $_SESSION["usuario"] = [
-        "admin" => false
-    ];
+    $_SESSION["usuario"] = ["admin" => false];
     $_SESSION["logado"] = false;
 }
 
