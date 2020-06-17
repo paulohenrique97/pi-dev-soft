@@ -72,7 +72,7 @@
         if (confirm(texto)) {
             let url = `/admin/usuarios/deletar/${id}`;
             fetch(url, {
-                method: "delete"
+                method: "post"
             }).then((resposta) => {
                 location.reload();
             }).catch((e) => {

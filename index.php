@@ -407,7 +407,7 @@ $app->post("/admin/categorias/cadastrar", function (Request $request, Response $
     return;
 });
 
-$app->delete("/admin/categorias/deletar/{id}", function (Request $request, Response $response, $args) {
+$app->post("/admin/categorias/deletar/{id}", function (Request $request, Response $response, $args) {
 
     atualiza_usuario();
     if (!logado()) {
@@ -599,7 +599,7 @@ $app->post("/admin/produtos/cadastrar", function (Request $request, Response $re
     return;
 });
 
-$app->delete("/admin/produtos/deletar/{id}", function (Request $request, Response $response, $args) {
+$app->post("/admin/produtos/deletar/{id}", function (Request $request, Response $response, $args) {
 
     atualiza_usuario();
     if (!logado()) {
@@ -747,7 +747,7 @@ $app->get("/admin/usuarios", function (Request $request, Response $response, $ar
     ]);
 });
 
-$app->delete("/admin/usuarios/deletar/{id}", function (Request $request, Response $response, $args) {
+$app->post("/admin/usuarios/deletar/{id}", function (Request $request, Response $response, $args) {
 
     atualiza_usuario();
     if (!logado()) {
