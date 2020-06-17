@@ -225,7 +225,7 @@ $app->post("/perfil", function (Request $request, Response $response, $args) {
         . "\nWHERE id = $id;";
 
     if (query($sql)) novo_alerta("success", "Dados atualizados com sucesso.");
-    novo_alerta("danger", "Algo deu errado, tente novamente mais tarde.");
+    else novo_alerta("danger", "Algo deu errado, tente novamente mais tarde.");
 
     header("Location: /perfil");
     return;
