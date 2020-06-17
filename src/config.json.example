@@ -1,0 +1,8 @@
+{
+    "banco_de_dados": {
+        "servidor": "localhost",
+        "usuario": "root",
+        "senha": "",
+        "nome": "db_ecommerce"
+    }
+}

@@ -8,10 +8,12 @@ define("TABELA_USUARIOS", "tb_usuarios");
 
 function conectar()
 {
-    $servidor = "localhost";
-    $usuario = "root";
-    $senha = "";
-    $banco_de_dados = "db_ecommerce";
+    $arquivo_config = file_get_contents("src/config.json");
+    $config = json_decode($arquivo_config, true);
+    $servidor = $config["banco_de_dados"]["servidor"];
+    $usuario = $config["banco_de_dados"]["usuario"];
+    $senha = $config["banco_de_dados"]["senha"];
+    $banco_de_dados = $config["banco_de_dados"]["nome"];
 
     $conexao = mysqli_connect($servidor, $usuario, $senha, $banco_de_dados);
     if ($conexao) {
