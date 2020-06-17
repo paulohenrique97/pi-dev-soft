@@ -15,12 +15,8 @@ function conectar()
     $senha = $config["banco_de_dados"]["senha"];
     $banco_de_dados = $config["banco_de_dados"]["nome"];
 
-    $conexao = mysqli_connect($servidor, $usuario, $senha, $banco_de_dados);
-    if ($conexao) {
-        return $conexao;
-    } else {
-        die("Conexão falhou: " . mysqli_connect_error());
-    }
+    if ($conexao = mysqli_connect($servidor, $usuario, $senha, $banco_de_dados)) return $conexao;
+    else die("Conexão falhou: " . mysqli_connect_error());
 }
 
 function desconectar($conexao)
@@ -32,7 +28,7 @@ function select(string $sql)
 {
     $conexao = conectar();
     $resultado = array();
-
+    
     if ($resultado_query = mysqli_query($conexao, $sql)) {
         while ($linha = mysqli_fetch_assoc($resultado_query)) {
             array_push($resultado, $linha);
