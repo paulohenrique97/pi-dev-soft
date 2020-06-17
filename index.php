@@ -1,5 +1,10 @@
 <?php
 
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Factory\AppFactory;
+use Slim\Views\Twig;
+
 require_once "vendor/autoload.php";
 require_once "src/db.php";
 require_once "src/autentica.php";
